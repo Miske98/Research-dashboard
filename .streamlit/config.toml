@@ -1,8 +1,8 @@
 [theme]
-primaryColor = "#a3b18a"
+primaryColor = "#648381"
 backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#d9a15b"
+secondaryBackgroundColor = "#F5F5F5"
 textColor = "#2D2A26"
 font = "serif"
-showWidgetBorder=true
+showWidgetBorder = true
 borderColor = "#2D2A26"
