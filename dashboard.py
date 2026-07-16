@@ -142,15 +142,7 @@ st.markdown(
 # Data loading & Configuration
 # ---------------------------------------------------------------------------
 
-LOCAL_FILE_DEFAULT = "C:/Users/Administrator/Desktop/Gigs/Jelena Simic/Arc_normalized.xlsx"
-
 GSHEET_URL_DEFAULT = "https://docs.google.com/spreadsheets/d/1NGbN5Cm274KToPHbb9v74XQp0QbBeFgRGpa9Xs6OnA4/edit?usp=sharing"
-
-
-@st.cache_data(show_spinner="Loading data...")
-def load_local_excel(file) -> pd.DataFrame:
-    return pd.read_excel(file)
-
 
 @st.cache_data(show_spinner="Loading data from Google Sheets...")
 def load_google_sheet(sheet_url: str, worksheet_name: str = None) -> pd.DataFrame:
@@ -195,13 +187,13 @@ TOTAL_N = baza["Code"].nunique() if "Code" in baza.columns else len(baza)
 # Header
 # ---------------------------------------------------------------------------
 
-st.title("Research Tool")
+st.title("Interactive Research Tool", , width="stretch", text_alignment="left")
 
 # ---------------------------------------------------------------------------
 # Patient filters — Main Page, Top Row (Horizontal Layout)
 # ---------------------------------------------------------------------------
 
-st.markdown("### Patient filters")
+st.markdown("### 1. Patient filters")
 
 # Kreiramo tri kolone na vrhu stranice za horizontalne filtere
 filt_col1, filt_col2, filt_col3 = st.columns(3, gap="large")
@@ -520,7 +512,7 @@ def render_measurement(value_name, panels, plot_types, timepoints_order):
 # Main — category & sub-filter selection
 # ---------------------------------------------------------------------------
 
-st.markdown("### Choose what to analyze")
+st.markdown("### 2. Measurements & Graphs")
 
 CATEGORIES = [
     "Shear Wave Velocity",
@@ -539,7 +531,7 @@ with col_a:
     category = st.selectbox("Measurements", CATEGORIES)
 with col_c:
     plot_types = st.multiselect(
-        "Chart types",
+        "Graph types",
         ["Error Bars", "Individual Line Plot", "Boxplot"],
         default=["Error Bars", "Individual Line Plot", "Boxplot"],
     )
@@ -551,7 +543,7 @@ st.markdown("---")
 # ---------------------------------------------------------------------------
 
 if not plot_types:
-    st.info("Select at least one chart type above to see results.")
+    st.info("Select at least one graph type above to see results.")
     st.stop()
 
 
