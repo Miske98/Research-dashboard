@@ -25,32 +25,107 @@ FONT_IMPORTS = """
     @import url('https://fonts.cdnfonts.com/css/cascadia-code');
 """
 
+# TOPLI PASTELNI STIL (Krem pozadina, beli plotovi, uočljivi selectbox-evi)
 st.markdown(
     f"""
     <style>
     {FONT_IMPORTS}
 
+    /* Globalna pozadina aplikacije - topla krem boja */
+    .stApp {{
+        background-color: #FDFBF7;
+    }}
+
+    /* Fontovi */
     html, body, [class*="css"] {{
         font-family: 'Bookman Old Style', Georgia, 'Times New Roman', serif;
+        color: #2D2A26;
     }}
     h1, h2, h3, h4, h5, h6, p, label, span, div[data-testid="stMarkdownContainer"] {{
         font-family: 'Bookman Old Style', Georgia, 'Times New Roman', serif;
+        color: #2D2A26;
     }}
-    /* Numbers / data-heavy widgets in Cascadia Code */
+    
+    /* Brojevi i tehnički detalji u Cascadia Code */
     [data-testid="stMetricValue"], [data-testid="stMetricLabel"],
     .stDataFrame, .stTable, code, pre,
     div[data-baseweb="slider"] div, div[data-baseweb="input"] input,
     div[data-testid="stNumberInput"] input {{
         font-family: 'Cascadia Code', 'Consolas', monospace !important;
     }}
-    .small-note {{ color: #6b6b6b; font-size: 0.85rem; }}
+
+    /* STILIZACIJA SELECTBOX-EVA I INPUT POLJA (Da se vide kristalno jasno) */
+    div[data-baseweb="select"] {{
+        background-color: #FFFFFF !important;
+        border: 2px solid #E2DCD2 !important; /* Blaga, ali vidljiva pastelno-krem ivica */
+        border-radius: 8px !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+        transition: all 0.2s ease-in-out;
+    }}
+    
+    /* Efekat kada se pređe mišem ili klikne na selectbox */
+    div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {{
+        border-color: #A3B19B !important; /* Pastelna žalfija zelena na fokus */
+        box-shadow: 0 2px 8px rgba(163, 177, 155, 0.2) !important;
+    }}
+
+    /* Stilizacija padajućeg menija unutar selectbox-a */
+    div[role="listbox"] {{
+        background-color: #FFFFFF !important;
+        border: 1px solid #E2DCD2 !important;
+    }}
+
+    /* Stilizacija multiselect tagova (male loptice/kocke za izabrane opcije) */
+    span[data-baseweb="tag"] {{
+        background-color: #EBF1E9 !important; /* Nežna pastelno zelena pozadina za tagove */
+        color: #4A5D4E !important;
+        border-radius: 4px !important;
+        font-weight: 500;
+    }}
+
+    /* Stilizacija klizača (Sliders) */
+    div[data-testid="stSlider"] div {{
+        color: #8CA182 !important; /* Pastelno zeleni detalji na slideru */
+    }}
+
+    /* Kartice / Kontejneri za grafikone - da budu čisto beli i odignuti od krem pozadine */
+    div[data-testid="element-container"] > div.stPlotlyChart {{
+        background-color: #FFFFFF !important;
+        padding: 15px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+        border: 1px solid #F0EAE1 !important;
+    }}
+
+    /* Sporedne beleške */
+    .small-note {{ 
+        color: #7D7871; 
+        font-size: 0.85rem; 
+    }}
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-PLOTLY_FONT = dict(family="Cascadia Code, Consolas, monospace", size=13)
-PLOTLY_TITLE_FONT = dict(family="Bookman Old Style, Georgia, serif", size=16)
+# ---------------------------------------------------------------------------
+# Pastelne Plotly Boje (Mekane, akademske, nikako agresivne)
+# ---------------------------------------------------------------------------
+PLOTLY_FONT = dict(family="Cascadia Code, Consolas, monospace", size=13, color="#2D2A26")
+PLOTLY_TITLE_FONT = dict(family="Bookman Old Style, Georgia, serif", size=16, color="#2D2A26")
+
+# Kolekcija prelepih pastelnih tonova (žalfija, prigušena plava, breskva, lavanda, pesak...)
+SPAGHETTI_PALETTE = [
+    "#A8C3BC", # Nežna žalfija
+    "#ADC3D1", # Prigušena čelično plava
+    "#CFB9A5", # Topli kapućino
+    "#D3B5C1", # Prigušena pastelna roze
+    "#C4CCD3", # Svetlo siva / magla
+    "#B9C0A5", # Maslinasto zelena
+    "#E2C2B9", # Nežna terakota / breskva
+    "#CBB5D3", # Nežna lavanda
+    "#E8D5B7", # Boja peska
+    "#A5B8C0"  # Svetla plavo-siva
+]
 
 
 # ---------------------------------------------------------------------------
