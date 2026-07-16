@@ -4,6 +4,7 @@ import uuid
 import pandas as pd
 import numpy as np
 import streamlit as st
+import streamlit.components.v1 as components
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
@@ -58,7 +59,7 @@ PLOTLY_TITLE_FONT = dict(family="Bookman Old Style, Georgia, serif", size=16)
 
 LOCAL_FILE_DEFAULT = "C:/Users/Administrator/Desktop/Gigs/Jelena Simic/Arc_normalized.xlsx"
 
-# OVDE Ubaci svoj pravi Google Sheet URL
+# OVDE UBACI SVOJ PRAVI GOOGLE SHEET URL KOJI ŽELIŠ DA BUDE INTEGRISAN
 GSHEET_URL_DEFAULT = "https://docs.google.com/spreadsheets/d/1NGbN5Cm274KToPHbb9v74XQp0QbBeFgRGpa9Xs6OnA4/edit?usp=sharing"
 
 
@@ -77,7 +78,6 @@ def load_google_sheet(sheet_url: str, worksheet_name: str = None) -> pd.DataFram
     
     scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
     
-    # Provera da li tajna postoji pre autorizacije
     if "gcp_service_account" not in st.secrets:
         st.error(
             "GCP Service Account secrets are missing! "
@@ -113,7 +113,7 @@ def get_data() -> pd.DataFrame:
             )
             st.stop()
     else:
-        # Google Sheets logika je sada aktivirana i poziva automatski definisan URL
+        # Google Sheets automatski vuče "bake-ovani" URL
         try:
             return load_google_sheet(GSHEET_URL_DEFAULT)
         except Exception as e:
@@ -310,8 +310,10 @@ def make_box_fig(long_df, value_name, title):
 
 def render_linked_line_charts(panels, height=380):
     """
-    Renders every figure inside one iframe component using st.iframe
-    so that hover sync continues working seamlessly.
+    panels: list of (title, go.Figure) tuples — 1 (single) or 2 (side-by-side).
+    Renders every figure inside ONE html component so that
+    hovering a patient's line in any panel highlights that same patient's
+    line in ALL panels, and dims every other line/point.
     """
     div_ids = [f"plotlydiv_{uuid.uuid4().hex[:8]}" for _ in panels]
     fig_jsons = [pio.to_json(fig) for _, fig in panels]
@@ -335,21 +337,16 @@ def render_linked_line_charts(panels, height=380):
 
     div_ids_js = json.dumps(div_ids)
 
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
+    html = f"""
     <style>
         {FONT_IMPORTS}
-        body {{ margin:0; padding: 10px; font-family: 'Bookman Old Style', Georgia, serif; overflow:hidden; }}
+        body {{ margin:0; font-family: 'Bookman Old Style', Georgia, serif; }}
         .row {{ display:flex; gap:20px; width:100%; }}
         .panel-title {{
             font-family: 'Bookman Old Style', Georgia, serif;
             font-size: 15px; font-weight: bold; margin-bottom: 4px;
         }}
     </style>
-    </head>
-    <body>
     <div class="row">{divs_html}</div>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script>
@@ -391,12 +388,8 @@ def render_linked_line_charts(panels, height=380):
         }});
     }});
     </script>
-    </body>
-    </html>
     """
-    
-    # Moderni Streamlit st.iframe poziv sa srcdoc parametrom
-    st.iframe(srcdoc=html_content, height=height + 80, scrolling=False)
+    components.html(html, height=height + 55, scrolling=False)
 
 
 def render_measurement(value_name, panels, plot_types, timepoints_order):
