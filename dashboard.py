@@ -95,7 +95,6 @@ TOTAL_N = baza["Code"].nunique() if "Code" in baza.columns else len(baza)
 # Sidebar — universal patient filters
 # ---------------------------------------------------------------------------
 
-st.sidebar.markdown("---")
 st.sidebar.header("Patient filters")
 
 
@@ -170,7 +169,7 @@ if N_FILTERED == 0:
 # Header
 # ---------------------------------------------------------------------------
 
-st.title("BoNT-A Spasticity Research Dashboard")
+st.title("Research Tool")
 st.caption(
     f"{N_FILTERED} patients selected"
 )
@@ -366,16 +365,7 @@ def render_measurement(value_name, panels, plot_types, timepoints_order):
 
     n_cols = len(panels)
 
-    # Patient-count captions
     cols = st.columns(n_cols, gap="large") if n_cols > 1 else [st.container()]
-    for (title, df), col in zip(panels, cols):
-        with col:
-            n_patients = df["Code"].nunique() if not df.empty else 0
-            st.markdown(
-                f"**{title}**  \n<span class='small-note'>n = {n_patients} patients contributing data</span>",
-                unsafe_allow_html=True,
-            )
-
     if "Error Bars" in plot_types:
         cols = st.columns(n_cols, gap="large") if n_cols > 1 else [st.container()]
         for (title, df), col in zip(panels, cols):
