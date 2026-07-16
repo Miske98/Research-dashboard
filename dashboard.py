@@ -56,8 +56,8 @@ st.markdown(
 
     /* STILIZACIJA SELECTBOX-EVA (Sada imaju uočljivu pastelno-zelenu ivicu po defaultu) */
     div[data-baseweb="select"] {{
-        background-color: #FFFFFF !important;
-        border: 2px solid #8CA182 !important; /* Pastelna žalfija-zelena */
+        background-color: #E2DCD2 !important;
+        border: 2px solid #5B6F53 !important;
         border-radius: 8px !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
         transition: all 0.2s ease-in-out;
@@ -65,6 +65,7 @@ st.markdown(
     
     /* Kada se pređe mišem ili klikne na selectbox (intenzivnija pastelna nijansa) */
     div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {{
+        background-color: #FFFFFF;
         border-color: #5B6F53 !important; /* Tamnija pastelno zelena */
         box-shadow: 0 2px 8px rgba(140, 161, 130, 0.3) !important;
     }}
