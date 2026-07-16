@@ -36,13 +36,113 @@ SPAGHETTI_PALETTE = [
     "#A5B8C0"  # Svetla plavo-siva
 ]
 
+# ---------------------------------------------------------------------------
+# Page Styling (White background + Sage Green & Terracotta Accents)
+# ---------------------------------------------------------------------------
+st.markdown(
+    f"""
+    <style>
+    {FONT_IMPORTS}
+
+    /* Čista bela pozadina za celu aplikaciju */
+    .stApp {{
+        background-color: #FFFFFF;
+    }}
+
+    /* Fontovi i globalna boja teksta (tamni antracit za bolji kontrast) */
+    html, body, [class*="css"] {{
+        font-family: 'Bookman Old Style', Georgia, 'Times New Roman', serif;
+        color: #2D2A26;
+    }}
+    h1, h2, h3, h4, h5, h6, p, label, span, div[data-testid="stMarkdownContainer"] {{
+        font-family: 'Bookman Old Style', Georgia, 'Times New Roman', serif;
+        color: #2D2A26;
+    }}
+    
+    /* Brojevi i tehnički detalji u Cascadia Code */
+    [data-testid="stMetricValue"], [data-testid="stMetricLabel"],
+    .stDataFrame, .stTable, code, pre,
+    div[data-baseweb="slider"] div, div[data-baseweb="input"] input,
+    div[data-testid="stNumberInput"] input {{
+        font-family: 'Cascadia Code', 'Consolas', monospace !important;
+    }}
+
+    /* STILIZACIJA SELECTBOX-EVA (Podrazumevano žalfija-zeleni, na klik cigla-crveni) */
+    div[data-baseweb="select"] {{
+        background-color: #FFFFFF !important;
+        border: 2px solid #8CA182 !important; /* Pastelna žalfija-zelena */
+        border-radius: 8px !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01) !important;
+        transition: all 0.2s ease-in-out;
+    }}
+    
+    /* Kada se pređe mišem ili klikne na selectbox (Prelaz u meku cigla-crvenu) */
+    div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {{
+        border-color: #C36A59 !important; /* Mekana cigla-crvena */
+        box-shadow: 0 2px 8px rgba(195, 106, 89, 0.2) !important;
+    }}
+
+    /* Unutrašnjost otvorenog padajućeg menija */
+    div[role="listbox"] {{
+        background-color: #FFFFFF !important;
+        border: 1px solid #8CA182 !important;
+    }}
+
+    /* Multiselect tagovi (Spajanje žalfije i cigla-crvene za jasan kontrast) */
+    span[data-baseweb="tag"] {{
+        background-color: #EBF1E9 !important; /* Nežna pastelna žalfija pozadina */
+        color: #C36A59 !important; /* Tekst u cigla-crvenoj boji */
+        border-radius: 4px !important;
+        font-weight: bold;
+    }}
+    /* Iksic za brisanje taga */
+    span[data-baseweb="tag"] role[button] {{
+        color: #C36A59 !important;
+    }}
+
+    /* STILIZACIJA KLIZAČA (SLIDER-A) - Cigla crveni akcenti na zelenoj osnovi */
+    /* Krug koji se prevlači */
+    div[data-testid="stSlider"] div[role="slider"] {{
+        background-color: #C36A59 !important; /* Cigla-crveni krug */
+        border: 2px solid #C36A59 !important;
+    }}
+    /* Aktivni (popunjeni) deo trake slidera */
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
+        background: #C36A59 !important;
+    }}
+    /* Neaktivna pozadina trake slidera */
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
+        background-color: #EBF1E9 !important; /* Nežna žalfija za neaktivnu traku */
+    }}
+    /* Brojevi iznad klizača */
+    div[data-testid="stSlider"] div {{
+        color: #2D2A26 !important;
+    }}
+
+    /* Okviri oko grafikona - čist, beo izgled sa suptilnom senkom */
+    div[data-testid="element-container"] > div.stPlotlyChart {{
+        background-color: #FFFFFF !important;
+        padding: 15px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 16px rgba(140, 161, 130, 0.08) !important; /* Blaga zelenkasta senka */
+        border: 1px solid #EBF1E9 !important; /* Suptilna ivica */
+    }}
+
+    /* Sporedne beleške */
+    .small-note {{ 
+        color: #7D7871; 
+        font-size: 0.85rem; 
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # ---------------------------------------------------------------------------
 # Data loading & Configuration
 # ---------------------------------------------------------------------------
 
 LOCAL_FILE_DEFAULT = "C:/Users/Administrator/Desktop/Gigs/Jelena Simic/Arc_normalized.xlsx"
-
 
 GSHEET_URL_DEFAULT = "https://docs.google.com/spreadsheets/d/1NGbN5Cm274KToPHbb9v74XQp0QbBeFgRGpa9Xs6OnA4/edit?usp=sharing"
 
@@ -92,51 +192,57 @@ baza.columns = [str(c).strip() for c in baza.columns]
 TOTAL_N = baza["Code"].nunique() if "Code" in baza.columns else len(baza)
 
 # ---------------------------------------------------------------------------
-# Sidebar — universal patient filters
+# Header
 # ---------------------------------------------------------------------------
 
-st.sidebar.header("Patient filters")
+st.title("Research Tool")
 
+# ---------------------------------------------------------------------------
+# Patient filters — Main Page, Top Row (Horizontal Layout)
+# ---------------------------------------------------------------------------
 
-# Earlier BoNT-A treatment in legs (Yes / No, both selectable at once)
-if "Earlier BoNT-A treatment in legs" in baza.columns:
-    earlier_options = sorted([s for s in baza["Earlier BoNT-A treatment in legs"].dropna().unique()])
-    earlier_sel = st.sidebar.multiselect(
-        "Earlier BoNT-A treatment in legs", earlier_options, default=earlier_options
-    )
-else:
-    earlier_sel = None
+st.markdown("### Patient filters")
 
-# Age when stroke — double-ended slider
-if "Age when stroke" in baza.columns and baza["Age when stroke"].notna().any():
-    age_min = int(np.floor(baza["Age when stroke"].min()))
-    age_max = int(np.ceil(baza["Age when stroke"].max()))
-    if age_min == age_max:
-        age_max += 1
-    age_range = st.sidebar.slider("Age at stroke (years)", age_min, age_max, (age_min, age_max))
-else:
-    age_range = None
+# Kreiramo tri kolone na vrhu stranice za horizontalne filtere
+filt_col1, filt_col2, filt_col3 = st.columns(3, gap="large")
 
-# Days between stroke and BoNT-A — unlocked only if "Yes" is among selected
-days_col = "Days between stroke and BoNT-A"
-yes_selected = True
+with filt_col1:
+    # Earlier BoNT-A treatment in legs (Yes / No, both selectable at once)
+    if "Earlier BoNT-A treatment in legs" in baza.columns:
+        earlier_options = sorted([s for s in baza["Earlier BoNT-A treatment in legs"].dropna().unique()])
+        earlier_sel = st.multiselect(
+            "Earlier BoNT-A treatment in legs", earlier_options, default=earlier_options
+        )
+    else:
+        earlier_sel = None
 
-if days_col in baza.columns and baza[days_col].notna().any():
-    days_min = int(np.floor(baza[days_col].min(skipna=True)))
-    days_max = int(np.ceil(baza[days_col].max(skipna=True)))
-    if days_min == days_max:
-        days_max += 1
-    days_range = st.sidebar.slider(
-        "Days between stroke and BoNT-A",
-        days_min, days_max, (days_min, days_max)
-    )
-else:
-    days_range = None
+with filt_col2:
+    # Age when stroke — double-ended slider
+    if "Age when stroke" in baza.columns and baza["Age when stroke"].notna().any():
+        age_min = int(np.floor(baza["Age when stroke"].min()))
+        age_max = int(np.ceil(baza["Age when stroke"].max()))
+        if age_min == age_max:
+            age_max += 1
+        age_range = st.slider("Age at stroke (years)", age_min, age_max, (age_min, age_max))
+    else:
+        age_range = None
 
-st.sidebar.markdown(
-    f'<p class="small-note">Total patients in dataset: {TOTAL_N}</p>',
-    unsafe_allow_html=True,
-)
+with filt_col3:
+    # Days between stroke and BoNT-A — unlocked only if "Yes" is among selected
+    days_col = "Days between stroke and BoNT-A"
+    yes_selected = True
+
+    if days_col in baza.columns and baza[days_col].notna().any():
+        days_min = int(np.floor(baza[days_col].min(skipna=True)))
+        days_max = int(np.ceil(baza[days_col].max(skipna=True)))
+        if days_min == days_max:
+            days_max += 1
+        days_range = st.slider(
+            "Days between stroke and BoNT-A",
+            days_min, days_max, (days_min, days_max)
+        )
+    else:
+        days_range = None
 
 # --- Apply universal filters ---
 filtered = baza.copy()
@@ -155,24 +261,28 @@ if days_range is not None and yes_selected:
 
 N_FILTERED = filtered["Code"].nunique() if "Code" in filtered.columns else len(filtered)
 
-st.sidebar.markdown(
-    f'<p class="small-note">Patients matching filters: <b>{N_FILTERED}</b></p>',
-    unsafe_allow_html=True,
-)
+# Prikaz statistike o filtriranim pacijentima odmah ispod filtera
+stats_col1, stats_col2 = st.columns(2)
+with stats_col1:
+    st.markdown(
+        f'<p class="small-note" style="margin-top:-10px;">Total patients in dataset: <b>{TOTAL_N}</b></p>',
+        unsafe_allow_html=True,
+    )
+with stats_col2:
+    st.markdown(
+        f'<p class="small-note" style="margin-top:-10px; text-align:right;">Patients matching filters: <b>{N_FILTERED}</b></p>',
+        unsafe_allow_html=True,
+    )
 
-if N_FILTERED == 0:
-    st.warning("No patients match the current filters. Please widen the filter criteria in the sidebar.")
-    st.stop()
-
-
-# ---------------------------------------------------------------------------
-# Header
-# ---------------------------------------------------------------------------
-
-st.title("Research Tool")
 st.caption(
     f"{N_FILTERED} patients selected"
 )
+
+if N_FILTERED == 0:
+    st.warning("No patients match the current filters. Please widen the filter criteria above.")
+    st.stop()
+
+st.markdown("---")
 
 # ---------------------------------------------------------------------------
 # Helper: hover template + color mapping for the individual line plots
