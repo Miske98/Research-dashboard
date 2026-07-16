@@ -25,15 +25,15 @@ FONT_IMPORTS = """
     @import url('https://fonts.cdnfonts.com/css/cascadia-code');
 """
 
-# TOPLI PASTELNI STIL (Krem pozadina, beli plotovi, uočljivi selectbox-evi)
+# ČISTA BELA POZADINA + PASTELNO ZELENI DETALJI
 st.markdown(
     f"""
     <style>
     {FONT_IMPORTS}
 
-    /* Globalna pozadina aplikacije - topla krem boja */
+    /* Čista bela pozadina za celu aplikaciju */
     .stApp {{
-        background-color: #FDFBF7;
+        background-color: #FFFFFF;
     }}
 
     /* Fontovi */
@@ -54,47 +54,56 @@ st.markdown(
         font-family: 'Cascadia Code', 'Consolas', monospace !important;
     }}
 
-    /* STILIZACIJA SELECTBOX-EVA I INPUT POLJA (Da se vide kristalno jasno) */
+    /* STILIZACIJA SELECTBOX-EVA (Sada imaju uočljivu pastelno-zelenu ivicu po defaultu) */
     div[data-baseweb="select"] {{
         background-color: #FFFFFF !important;
-        border: 2px solid #E2DCD2 !important; /* Blaga, ali vidljiva pastelno-krem ivica */
+        border: 2px solid #8CA182 !important; /* Pastelna žalfija-zelena */
         border-radius: 8px !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
         transition: all 0.2s ease-in-out;
     }}
     
-    /* Efekat kada se pređe mišem ili klikne na selectbox */
+    /* Kada se pređe mišem ili klikne na selectbox (intenzivnija pastelna nijansa) */
     div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {{
-        border-color: #A3B19B !important; /* Pastelna žalfija zelena na fokus */
-        box-shadow: 0 2px 8px rgba(163, 177, 155, 0.2) !important;
+        border-color: #5B6F53 !important; /* Tamnija pastelno zelena */
+        box-shadow: 0 2px 8px rgba(140, 161, 130, 0.3) !important;
     }}
 
     /* Stilizacija padajućeg menija unutar selectbox-a */
     div[role="listbox"] {{
         background-color: #FFFFFF !important;
-        border: 1px solid #E2DCD2 !important;
+        border: 1px solid #8CA182 !important;
     }}
 
-    /* Stilizacija multiselect tagova (male loptice/kocke za izabrane opcije) */
+    /* Multiselect tagovi (male loptice za izabrane opcije u selectbox-u) */
     span[data-baseweb="tag"] {{
-        background-color: #EBF1E9 !important; /* Nežna pastelno zelena pozadina za tagove */
+        background-color: #EBF1E9 !important; /* Nežna pastelno zelena */
         color: #4A5D4E !important;
         border-radius: 4px !important;
         font-weight: 500;
     }}
 
-    /* Stilizacija klizača (Sliders) */
+    /* STILIZACIJA KLIZAČA (SLIDER-A) - da sve prati pastelno zeleni ton */
+    /* Aktivni deo trake slidera */
+    div[data-testid="stSlider"] div[role="slider"] {{
+        background-color: #8CA182 !important;
+        border: 2px solid #8CA182 !important;
+    }}
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
+        background: #8CA182 !important;
+    }}
+    /* Brojevi iznad klizača */
     div[data-testid="stSlider"] div {{
-        color: #8CA182 !important; /* Pastelno zeleni detalji na slideru */
+        color: #4A5D4E !important;
     }}
 
-    /* Kartice / Kontejneri za grafikone - da budu čisto beli i odignuti od krem pozadine */
+    /* Okviri oko grafikona - čisto bela pozadina, ali sa finom zelenkastom ivicom da ih nežno odvoji */
     div[data-testid="element-container"] > div.stPlotlyChart {{
         background-color: #FFFFFF !important;
         padding: 15px !important;
         border-radius: 12px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
-        border: 1px solid #F0EAE1 !important;
+        border: 1px solid #EBF1E9 !important; /* Ekstremno blaga pastelna ivica */
     }}
 
     /* Sporedne beleške */
@@ -106,7 +115,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
 # ---------------------------------------------------------------------------
 # Pastelne Plotly Boje (Mekane, akademske, nikako agresivne)
 # ---------------------------------------------------------------------------
