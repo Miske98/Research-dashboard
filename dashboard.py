@@ -187,7 +187,7 @@ TOTAL_N = baza["Code"].nunique() if "Code" in baza.columns else len(baza)
 # Header
 # ---------------------------------------------------------------------------
 
-st.title("Interactive Research Tool", , width="stretch", text_alignment="left")
+st.title("Interactive Research Tool", width="stretch", text_alignment="left")
 
 # ---------------------------------------------------------------------------
 # Patient filters — Main Page, Top Row (Horizontal Layout)
