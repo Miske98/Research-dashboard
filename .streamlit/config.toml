@@ -7,5 +7,4 @@ baseRadius="full"
 
 [theme.sidebar]
 backgroundColor="aliceBlue"
-secondaryBackgroundColor="skyBlue"
-baseRadius="none"
+secondaryBackgroundColor="lightsalmon"
