@@ -11,10 +11,6 @@ import plotly.io as pio
 
 import dashboard_logic as dl
 
-# ---------------------------------------------------------------------------
-# Page config & styling
-# ---------------------------------------------------------------------------
-
 st.set_page_config(
     page_title="Interactive Research Dashboard",
     layout="wide",
@@ -25,7 +21,7 @@ FONT_IMPORTS = """
     @import url('https://fonts.cdnfonts.com/css/cascadia-code');
 """
 
-# ČISTA BELA POZADINA + PASTELNO ZELENI DETALJI
+# TOPLI PASTELNI DIZAJN (Bela + Žalfija Zelena + Cigla Crvena)
 st.markdown(
     f"""
     <style>
@@ -36,7 +32,7 @@ st.markdown(
         background-color: #FFFFFF;
     }}
 
-    /* Fontovi */
+    /* Fontovi i globalna boja teksta (tamni antracit za bolji kontrast) */
     html, body, [class*="css"] {{
         font-family: 'Bookman Old Style', Georgia, 'Times New Roman', serif;
         color: #2D2A26;
@@ -54,57 +50,65 @@ st.markdown(
         font-family: 'Cascadia Code', 'Consolas', monospace !important;
     }}
 
-    /* STILIZACIJA SELECTBOX-EVA (Sada imaju uočljivu pastelno-zelenu ivicu po defaultu) */
+    /* STILIZACIJA SELECTBOX-EVA (Podrazumevano žalfija-zeleni, na klik cigla-crveni) */
     div[data-baseweb="select"] {{
-        background-color: #E2DCD2 !important;
-        border: 2px solid #5B6F53 !important;
+        background-color: #FFFFFF !important;
+        border: 2px solid #8CA182 !important; /* Pastelna žalfija-zelena */
         border-radius: 8px !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01) !important;
         transition: all 0.2s ease-in-out;
     }}
     
-    /* Kada se pređe mišem ili klikne na selectbox (intenzivnija pastelna nijansa) */
+    /* Kada se pređe mišem ili klikne na selectbox (Prelaz u meku cigla-crvenu) */
     div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {{
-        background-color: #FFFFFF;
-        border-color: #5B6F53 !important; /* Tamnija pastelno zelena */
-        box-shadow: 0 2px 8px rgba(140, 161, 130, 0.3) !important;
+        border-color: #C36A59 !important; /* Mekana cigla-crvena */
+        box-shadow: 0 2px 8px rgba(195, 106, 89, 0.2) !important;
     }}
 
-    /* Stilizacija padajućeg menija unutar selectbox-a */
+    /* Unutrašnjost otvorenog padajućeg menija */
     div[role="listbox"] {{
         background-color: #FFFFFF !important;
         border: 1px solid #8CA182 !important;
     }}
 
-    /* Multiselect tagovi (male loptice za izabrane opcije u selectbox-u) */
+    /* Multiselect tagovi (Spajanje žalfije i cigla-crvene za jasan kontrast) */
     span[data-baseweb="tag"] {{
-        background-color: #EBF1E9 !important; /* Nežna pastelno zelena */
-        color: #4A5D4E !important;
+        background-color: #EBF1E9 !important; /* Nežna pastelna žalfija pozadina */
+        color: #C36A59 !important; /* Tekst u cigla-crvenoj boji */
         border-radius: 4px !important;
-        font-weight: 500;
+        font-weight: bold;
+    }}
+    /* Iksic za brisanje taga */
+    span[data-baseweb="tag"] role[button] {{
+        color: #C36A59 !important;
     }}
 
-    /* STILIZACIJA KLIZAČA (SLIDER-A) - da sve prati pastelno zeleni ton */
-    /* Aktivni deo trake slidera */
+    /* STILIZACIJA KLIZAČA (SLIDER-A) - Cigla crveni akcenti na zelenoj osnovi */
+    /* Krug koji se prevlači */
     div[data-testid="stSlider"] div[role="slider"] {{
-        background-color: #8CA182 !important;
-        border: 2px solid #8CA182 !important;
+        background-color: #C36A59 !important; /* Cigla-crveni krug */
+        border: 2px solid #C36A59 !important;
     }}
+    /* Aktivni (popunjeni) deo trake slidera */
     div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
-        background: #8CA182 !important;
+        background: #C36A59 !important;
+    }}
+    /* Neaktivna pozadina trake slidera */
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
+        background-color: #EBF1E9 !important; /* Nežna žalfija za neaktivnu traku */
     }}
     /* Brojevi iznad klizača */
     div[data-testid="stSlider"] div {{
-        color: #4A5D4E !important;
+        color: #2D2A26 !important;
     }}
 
-    /* Okviri oko grafikona - čisto bela pozadina, ali sa finom zelenkastom ivicom da ih nežno odvoji */
+    /* Okviri oko grafikona - čist, beo izgled sa suptilnom senkom */
     div[data-testid="element-container"] > div.stPlotlyChart {{
         background-color: #FFFFFF !important;
         padding: 15px !important;
         border-radius: 12px !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
-        border: 1px solid #EBF1E9 !important; /* Ekstremno blaga pastelna ivica */
+        box-shadow: 0 4px 16px rgba(140, 161, 130, 0.08) !important; /* Blaga zelenkasta senka */
+        border: 1px solid #EBF1E9 !important; /* Suptilna ivica */
     }}
 
     /* Sporedne beleške */
