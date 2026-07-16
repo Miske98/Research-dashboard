@@ -4,7 +4,6 @@ import uuid
 import pandas as pd
 import numpy as np
 import streamlit as st
-import streamlit.components.v1 as components
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
@@ -54,10 +53,13 @@ PLOTLY_TITLE_FONT = dict(family="Bookman Old Style, Georgia, serif", size=16)
 
 
 # ---------------------------------------------------------------------------
-# Data loading
+# Data loading & Configuration
 # ---------------------------------------------------------------------------
 
 LOCAL_FILE_DEFAULT = "C:/Users/Administrator/Desktop/Gigs/Jelena Simic/Arc_normalized.xlsx"
+
+# OVDE Ubaci svoj pravi Google Sheet URL
+GSHEET_URL_DEFAULT = "https://docs.google.com/spreadsheets/d/TVOJ_SHEET_ID_OVDE/edit#gid=0"
 
 
 @st.cache_data(show_spinner="Loading data...")
@@ -65,33 +67,36 @@ def load_local_excel(file) -> pd.DataFrame:
     return pd.read_excel(file)
 
 
-@st.cache_data(show_spinner="Loading data")
+@st.cache_data(show_spinner="Loading data from Google Sheets...")
 def load_google_sheet(sheet_url: str, worksheet_name: str = None) -> pd.DataFrame:
     """
-    Placeholder for the future Google Sheets data source.
-    To activate:
-      1. pip install gspread google-auth
-      2. Put a service-account JSON in st.secrets["gcp_service_account"]
-      3. Uncomment the code below and share the sheet with the service
-         account's email address.
+    Učitava podatke direktno sa Google Sheets koristeći gspread i servisni nalog.
     """
     import gspread
     from google.oauth2.service_account import Credentials
     
     scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    
+    # Provera da li tajna postoji pre autorizacije
+    if "gcp_service_account" not in st.secrets:
+        st.error(
+            "GCP Service Account secrets are missing! "
+            "Please add your service account JSON configuration to your Streamlit Secrets."
+        )
+        st.stop()
+        
     creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
     client = gspread.authorize(creds)
     sheet = client.open_by_url(sheet_url)
     ws = sheet.worksheet(worksheet_name) if worksheet_name else sheet.sheet1
     records = ws.get_all_records()
     return pd.DataFrame(records)
-    raise NotImplementedError("Google Sheets loading is not configured yet — fill in credentials in dashboard_logic / app.py.")
 
 
 def get_data() -> pd.DataFrame:
     st.sidebar.markdown("### Data source")
     source = st.sidebar.radio(
-        "Choose data source", ["Local Excel file", "Google Sheets (coming soon)"],
+        "Choose data source", ["Local Excel file", "Google Sheets"],
         index=0, label_visibility="collapsed",
     )
 
@@ -108,13 +113,17 @@ def get_data() -> pd.DataFrame:
             )
             st.stop()
     else:
-        st.sidebar.text_input("Google Sheet URL", key="gsheet_url", placeholder="https://docs.google.com/spreadsheets/d/...")
-        st.warning("Google Sheets connection is not configured yet in this deployment. Switch back to 'Local Excel file' for now.")
-        st.stop()
+        # Google Sheets logika je sada aktivirana i poziva automatski definisan URL
+        try:
+            return load_google_sheet(GSHEET_URL_DEFAULT)
+        except Exception as e:
+            st.error(f"Failed to connect to Google Sheets: {e}")
+            st.info("Make sure you shared your Google Sheet with the client email found inside your service account JSON file.")
+            st.stop()
 
 
 baza = get_data()
-baza = baza[~baza["Code"].isin([12,14,24,26,27])]
+baza = baza[~baza["Code"].isin([12, 14, 24, 26, 27])]
 
 # Basic sanity check / friendly column-name trimming
 baza.columns = [str(c).strip() for c in baza.columns]
@@ -210,12 +219,12 @@ st.caption(
 # ---------------------------------------------------------------------------
 
 HOVER_TEMPLATE = (
-    "<b>Patient %{customdata[0]}</b><br>"
-    "Timepoint: %{x}<br>"
-    "Value: %{y}<br>"
-    "Age at stroke: %{customdata[1]}<br>"
-    "Earlier BoNT-A in legs: %{customdata[3]}<br>"
-    "Stroke → BoNT-A: %{customdata[4]} days"
+    "<b>Patient %{{customdata[0]}}</b><br>"
+    "Timepoint: %{{x}}<br>"
+    "Value: %{{y}}<br>"
+    "Age at stroke: %{{customdata[1]}}<br>"
+    "Earlier BoNT-A in legs: %{{customdata[3]}}<br>"
+    "Stroke → BoNT-A: %{{customdata[4]}} days"
     "<extra></extra>"
 )
 CUSTOMDATA_COLS = ["Code", "Age when stroke", "Side of stroke",
@@ -301,12 +310,8 @@ def make_box_fig(long_df, value_name, title):
 
 def render_linked_line_charts(panels, height=380):
     """
-    panels: list of (title, go.Figure) tuples — 1 (single) or 2 (side-by-side).
-    Renders every figure inside ONE html component (single iframe) so that
-    hovering a patient's line in any panel highlights that same patient's
-    line in ALL panels, and dims every other line/point. This requires all
-    charts to live in the same DOM, which is why a single components.html
-    call is used instead of separate st.plotly_chart calls per column.
+    Renders every figure inside one iframe component using st.iframe
+    so that hover sync continues working seamlessly.
     """
     div_ids = [f"plotlydiv_{uuid.uuid4().hex[:8]}" for _ in panels]
     fig_jsons = [pio.to_json(fig) for _, fig in panels]
@@ -330,16 +335,21 @@ def render_linked_line_charts(panels, height=380):
 
     div_ids_js = json.dumps(div_ids)
 
-    html = f"""
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
     <style>
         {FONT_IMPORTS}
-        body {{ margin:0; font-family: 'Bookman Old Style', Georgia, serif; }}
+        body {{ margin:0; padding: 10px; font-family: 'Bookman Old Style', Georgia, serif; overflow:hidden; }}
         .row {{ display:flex; gap:20px; width:100%; }}
         .panel-title {{
             font-family: 'Bookman Old Style', Georgia, serif;
             font-size: 15px; font-weight: bold; margin-bottom: 4px;
         }}
     </style>
+    </head>
+    <body>
     <div class="row">{divs_html}</div>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script>
@@ -381,8 +391,12 @@ def render_linked_line_charts(panels, height=380):
         }});
     }});
     </script>
+    </body>
+    </html>
     """
-    components.html(html, height=height + 55, scrolling=False)
+    
+    # Moderni Streamlit st.iframe poziv sa srcdoc parametrom
+    st.iframe(srcdoc=html_content, height=height + 80, scrolling=False)
 
 
 def render_measurement(value_name, panels, plot_types, timepoints_order):
@@ -415,7 +429,7 @@ def render_measurement(value_name, panels, plot_types, timepoints_order):
                 if df.empty:
                     st.info(f"No data for '{title}'.")
                 else:
-                    st.plotly_chart(make_error_bar_fig(df, value_name, "Mean ± SD over time"), width='stretch', config = {'scrollZoom': False})
+                    st.plotly_chart(make_error_bar_fig(df, value_name, "Mean ± SD over time"), width='stretch', config={'scrollZoom': False})
 
     if "Individual Line Plot" in plot_types:
         all_codes = set()
@@ -445,7 +459,7 @@ def render_measurement(value_name, panels, plot_types, timepoints_order):
                 if df.empty:
                     st.info(f"No data for '{title}'.")
                 else:
-                    st.plotly_chart(make_box_fig(df, value_name, "Distribution by timepoint"), width='stretch', config = {'scrollZoom': False})
+                    st.plotly_chart(make_box_fig(df, value_name, "Distribution by timepoint"), width='stretch', config={'scrollZoom': False})
 
 
 # ---------------------------------------------------------------------------
