@@ -59,7 +59,7 @@ PLOTLY_TITLE_FONT = dict(family="Bookman Old Style, Georgia, serif", size=16)
 
 LOCAL_FILE_DEFAULT = "C:/Users/Administrator/Desktop/Gigs/Jelena Simic/Arc_normalized.xlsx"
 
-# OVDE UBACI SVOJ PRAVI GOOGLE SHEET URL KOJI ŽELIŠ DA BUDE INTEGRISAN
+
 GSHEET_URL_DEFAULT = "https://docs.google.com/spreadsheets/d/1NGbN5Cm274KToPHbb9v74XQp0QbBeFgRGpa9Xs6OnA4/edit?usp=sharing"
 
 
@@ -70,9 +70,6 @@ def load_local_excel(file) -> pd.DataFrame:
 
 @st.cache_data(show_spinner="Loading data from Google Sheets...")
 def load_google_sheet(sheet_url: str, worksheet_name: str = None) -> pd.DataFrame:
-    """
-    Učitava podatke direktno sa Google Sheets koristeći gspread i servisni nalog.
-    """
     import gspread
     from google.oauth2.service_account import Credentials
     
@@ -94,26 +91,6 @@ def load_google_sheet(sheet_url: str, worksheet_name: str = None) -> pd.DataFram
 
 
 def get_data() -> pd.DataFrame:
-    st.sidebar.markdown("### Data source")
-    source = st.sidebar.radio(
-        "Choose data source", ["Local Excel file", "Google Sheets"],
-        index=0, label_visibility="collapsed",
-    )
-
-    if source == "Local Excel file":
-        uploaded = st.sidebar.file_uploader("Upload 'baza.xlsx' (optional)", type=["xlsx", "xls"])
-        if uploaded is not None:
-            return load_local_excel(uploaded)
-        try:
-            return load_local_excel(LOCAL_FILE_DEFAULT)
-        except FileNotFoundError:
-            st.error(
-                f"Could not find '{LOCAL_FILE_DEFAULT}' next to app.py, and no file was uploaded. "
-                "Please upload the Excel file using the control in the sidebar."
-            )
-            st.stop()
-    else:
-        # Google Sheets automatski vuče "bake-ovani" URL
         try:
             return load_google_sheet(GSHEET_URL_DEFAULT)
         except Exception as e:
