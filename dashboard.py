@@ -59,7 +59,7 @@ PLOTLY_TITLE_FONT = dict(family="Bookman Old Style, Georgia, serif", size=16)
 LOCAL_FILE_DEFAULT = "C:/Users/Administrator/Desktop/Gigs/Jelena Simic/Arc_normalized.xlsx"
 
 # OVDE Ubaci svoj pravi Google Sheet URL
-GSHEET_URL_DEFAULT = "https://docs.google.com/spreadsheets/d/TVOJ_SHEET_ID_OVDE/edit#gid=0"
+GSHEET_URL_DEFAULT = "https://docs.google.com/spreadsheets/d/1NGbN5Cm274KToPHbb9v74XQp0QbBeFgRGpa9Xs6OnA4/edit?usp=sharing"
 
 
 @st.cache_data(show_spinner="Loading data...")
