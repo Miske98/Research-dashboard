@@ -1,7 +1,8 @@
 [theme]
 primaryColor = "#C36A59"
 backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "red"
+secondaryBackgroundColor = "#C36A59"
 textColor = "#2D2A26"
 font = "serif"
 showWidgetBorder=true
+borderColor = "black"
