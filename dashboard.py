@@ -1,16 +1,3 @@
-"""
-BoNT-A / Post-Stroke Spasticity Research Dashboard
-====================================================
-Streamlit app for exploring a wide-format longitudinal dataset of stroke
-patients treated with Botulinum Toxin A (BoNT-A) for lower-limb spasticity.
-
-Data source:
-  - For now: local Excel file (pandas.read_excel), loaded into a dataframe
-    called `baza`.
-  - Later: Google Sheets, via the same load_data() entry point -- see the
-    GOOGLE SHEETS section below, ready to be filled in with credentials.
-"""
-
 import json
 import uuid
 
