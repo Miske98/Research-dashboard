@@ -196,12 +196,12 @@ st.caption(
 # ---------------------------------------------------------------------------
 
 HOVER_TEMPLATE = (
-    "<b>Patient %{{customdata[0]}}</b><br>"
-    "Timepoint: %{{x}}<br>"
-    "Value: %{{y}}<br>"
-    "Age at stroke: %{{customdata[1]}}<br>"
-    "Earlier BoNT-A in legs: %{{customdata[3]}}<br>"
-    "Stroke → BoNT-A: %{{customdata[4]}} days"
+    "<b>Patient %{customdata[0]}</b><br>"
+    "Timepoint: %{x}<br>"
+    "Value: %{y}<br>"
+    "Age at stroke: %{customdata[1]} years<br>"
+    "Earlier BoNT-A in legs: %{customdata[3]}<br>"
+    "Stroke → BoNT-A: %{customdata[4]} days"
     "<extra></extra>"
 )
 CUSTOMDATA_COLS = ["Code", "Age when stroke", "Side of stroke",
